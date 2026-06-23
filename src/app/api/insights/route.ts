@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const topGenres = topArtists.items
-      .flatMap((a: any) => a.genres)
+      .flatMap((a: any) => a.genres ?? [])
       .reduce((acc: Record<string, number>, g: string) => {
         acc[g] = (acc[g] ?? 0) + 1;
         return acc;

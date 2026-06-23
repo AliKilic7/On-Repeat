@@ -58,7 +58,7 @@ export function TopArtists({ artists, lang = "tr" }: TopArtistsProps) {
                 </a>
               </div>
               <div className="flex flex-wrap gap-1 mt-1">
-                {artist.genres.slice(0, 2).map((g) => (
+                {(artist.genres ?? []).slice(0, 2).map((g) => (
                   <BadgePill key={g} label={g} color={getColorForGenre(g)} />
                 ))}
               </div>

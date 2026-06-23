@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const topGenres: Record<string, number> = {};
     for (const artist of artistsData.items) {
-      for (const genre of artist.genres) {
+      for (const genre of artist.genres ?? []) {
         topGenres[genre] = (topGenres[genre] ?? 0) + 1;
       }
     }

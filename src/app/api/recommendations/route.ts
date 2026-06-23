@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     const seedArtists = topArtists.items.slice(0, 2).map((a: any) => a.id);
     const seedTracks = topTracks.items.slice(0, 2).map((t: any) => t.id);
     const topGenres = topArtists.items
-      .flatMap((a: any) => a.genres)
+      .flatMap((a: any) => a.genres ?? [])
       .slice(0, 5);
     const uniqueGenres = [...new Set<string>(topGenres)].slice(0, 1);
 
