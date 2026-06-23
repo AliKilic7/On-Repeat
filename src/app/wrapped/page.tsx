@@ -66,7 +66,8 @@ export default function WrappedPage() {
 
   const totalMinutes = data ? Math.round(data.totalListeningTimeMs / 60000) : 0;
 
-  const slides = data ? [
+  const hasWrapped = !!data && Array.isArray(data.topTracks) && Array.isArray(data.topArtists) && Array.isArray(data.topGenres);
+  const slides = hasWrapped ? [
     {
       accent: "#1DB954",
       content: (

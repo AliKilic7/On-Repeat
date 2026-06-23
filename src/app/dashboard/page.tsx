@@ -34,13 +34,13 @@ export default function DashboardPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session) return;
+    if (status !== "authenticated") return;
     setLoading(true);
     fetch(`/api/analytics?time_range=${timeRange}`)
       .then((r) => r.json())
       .then((d) => { setData(d); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [session, timeRange]);
+  }, [status, timeRange]);
 
   if (status === "loading" || !session) {
     return (
@@ -84,7 +84,7 @@ export default function DashboardPage() {
           <div className="flex items-center justify-center py-40">
             <Spinner className="w-10 h-10" />
           </div>
-        ) : data ? (
+        ) : data && Array.isArray(data.topTracks) ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="space-y-5">
             <StatsGrid
               topTracksCount={data.topTracksCount}

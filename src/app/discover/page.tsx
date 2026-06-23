@@ -41,12 +41,12 @@ export default function DiscoverPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session) return;
+    if (status !== "authenticated") return;
     fetch("/api/recommendations")
       .then((r) => r.json())
       .then((d) => { setRecs(d.recommendations ?? []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [session]);
+  }, [status]);
 
   const handleFeedback = async (trackId: string, feedback: string) => {
     fetch("/api/recommendations", {

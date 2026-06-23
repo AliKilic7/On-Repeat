@@ -27,12 +27,12 @@ export default function SocialPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session) return;
+    if (status !== "authenticated") return;
     fetch("/api/friends")
       .then((r) => r.json())
       .then((d) => { setFriends(d.friends ?? []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [session]);
+  }, [status]);
 
   return (
     <div className="min-h-screen bg-[#0a0a0f]">

@@ -54,7 +54,7 @@ export default function InsightsPage() {
   }, [status, router]);
 
   useEffect(() => {
-    if (!session) return;
+    if (status !== "authenticated") return;
     Promise.all([
       fetch("/api/analytics?time_range=short_term").then(r => r.json()),
       fetch("/api/insights").then(r => r.json()),
@@ -63,7 +63,7 @@ export default function InsightsPage() {
       setInsightsData(ins);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, [session]);
+  }, [status]);
 
   if (status === "loading" || loading) {
     return (
