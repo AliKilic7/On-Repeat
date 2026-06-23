@@ -1,0 +1,197 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  spotifyId     String?   @unique
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  language      String    @default("tr")
+
+  accounts            Account[]
+  sessions            Session[]
+  listeningHistory    ListeningHistory[]
+  analytics           Analytics[]
+  recommendations     Recommendation[]
+  badges              UserBadge[]
+  sentFriendships     Friendship[] @relation("FriendshipSender")
+  receivedFriendships Friendship[] @relation("FriendshipReceiver")
+  wrappedReports      WrappedReport[]
+  aiInsights          AiInsight[]
+  explorerScore       ExplorerScore?
+}
+
+model ListeningHistory {
+  id         String   @id @default(cuid())
+  userId     String
+  trackId    String
+  trackName  String
+  artistId   String
+  artistName String
+  albumId    String
+  albumName  String
+  genres     String[]
+  playedAt   DateTime
+  durationMs Int
+  popularity Int      @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, playedAt])
+  @@index([userId, trackId])
+}
+
+model Analytics {
+  id        String   @id @default(cuid())
+  userId    String
+  period    String
+  startDate DateTime
+  endDate   DateTime
+  data      Json
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, period, startDate])
+  @@index([userId, period])
+}
+
+model Recommendation {
+  id         String   @id @default(cuid())
+  userId     String
+  trackId    String
+  trackName  String
+  artistName String
+  albumName  String
+  imageUrl   String?
+  previewUrl String?
+  category   String
+  reason     String
+  score      Float    @default(0)
+  feedback   String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, category])
+}
+
+model Badge {
+  id            String      @id @default(cuid())
+  key           String      @unique
+  name          String
+  nameEn        String
+  description   String
+  descriptionEn String
+  icon          String
+  color         String
+  userBadges    UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+}
+
+model Friendship {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  status     String   @default("pending")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  sender   User @relation("FriendshipSender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("FriendshipReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([receiverId])
+}
+
+model WrappedReport {
+  id        String   @id @default(cuid())
+  userId    String
+  period    String
+  startDate DateTime
+  endDate   DateTime
+  data      Json
+  shareCode String?  @unique
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, period])
+}
+
+model AiInsight {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  period    String
+  content   String   @db.Text
+  contentEn String?  @db.Text
+  data      Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type])
+}
+
+model ExplorerScore {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  discoveryScore Int      @default(0)
+  diversityScore Int      @default(0)
+  explorerScore  Int      @default(0)
+  totalTracks    Int      @default(0)
+  uniqueArtists  Int      @default(0)
+  uniqueGenres   Int      @default(0)
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
