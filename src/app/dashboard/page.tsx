@@ -87,20 +87,30 @@ export default function DashboardPage() {
         ) : data ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="space-y-5">
             <StatsGrid
-              totalListeningTimeMs={data.totalListeningTimeMs}
-              uniqueTracksCount={data.uniqueTracksCount}
+              topTracksCount={data.topTracksCount}
               uniqueArtistsCount={data.uniqueArtistsCount}
-              topGenresCount={data.topGenres.length}
+              uniqueGenresCount={data.uniqueGenresCount}
+              avgPopularity={data.avgPopularity}
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <TopTracks tracks={data.topTracks} />
               <TopArtists artists={data.topArtists} />
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <GenreChart genres={data.topGenres} />
-              <ListeningHeatmap listeningByHour={data.listeningByHour} />
+            <GenreChart genres={data.topGenres} />
+
+            {/* Recent listening section — Spotify API only exposes the last ~50 plays */}
+            <div className="pt-4">
+              <div className="flex items-center gap-2 mb-4">
+                <h2 className="text-sm font-semibold text-white">Son Dinleme Alışkanlıkların</h2>
+                <span className="text-[11px] text-white/30 bg-white/[0.04] px-2 py-0.5 rounded-md">
+                  son {data.recentPlaysCount} parça
+                </span>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                <ListeningHeatmap listeningByHour={data.listeningByHour} />
+                <WeekdayChart listeningByDayOfWeek={data.listeningByDayOfWeek} weekdayVsWeekend={data.weekdayVsWeekend} />
+              </div>
             </div>
-            <WeekdayChart listeningByDayOfWeek={data.listeningByDayOfWeek} weekdayVsWeekend={data.weekdayVsWeekend} />
           </motion.div>
         ) : (
           <div className="text-center py-40 text-white/25 text-sm">Veri yüklenemedi.</div>

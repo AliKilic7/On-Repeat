@@ -66,13 +66,36 @@ export async function GET(req: NextRequest) {
       (listeningByDayOfWeek["Saturday"] ?? 0) +
       (listeningByDayOfWeek["Sunday"] ?? 0);
 
+    // Range-accurate metrics (top tracks/artists reflect the selected time range)
+    const tracks = tracksData.items ?? [];
+    const artists = artistsData.items ?? [];
+    const avgPopularity =
+      tracks.length > 0
+        ? Math.round(
+            tracks.reduce((s: number, t: any) => s + (t.popularity ?? 0), 0) /
+              tracks.length
+          )
+        : 0;
+    // Estimated total time across top tracks for this range
+    const topTracksTotalMs = tracks.reduce(
+      (s: number, t: any) => s + (t.duration_ms ?? 0),
+      0
+    );
+
     return NextResponse.json({
-      topTracks: tracksData.items,
-      topArtists: artistsData.items,
+      topTracks: tracks,
+      topArtists: artists,
       topGenres: genresSorted,
+      // Range-accurate stats
+      topTracksCount: tracks.length,
+      uniqueArtistsCount: artists.length,
+      uniqueGenresCount: Object.keys(topGenres).length,
+      avgPopularity,
+      topTracksTotalMs,
+      // Recent-based stats (last ~50 plays only — Spotify API limit)
       totalListeningTimeMs: totalMs,
       uniqueTracksCount: new Set(recentData.items.map((i: any) => i.track.id)).size,
-      uniqueArtistsCount: artistsData.items.length,
+      recentPlaysCount: recentData.items.length,
       listeningByHour,
       listeningByDayOfWeek,
       weekdayVsWeekend: { weekday: weekdayTotal, weekend: weekendTotal },

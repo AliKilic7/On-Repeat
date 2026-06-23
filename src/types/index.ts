@@ -58,11 +58,18 @@ export interface AnalyticsData {
   topTracks: SpotifyTrack[];
   topArtists: SpotifyArtist[];
   topGenres: GenreCount[];
+  // Range-accurate
+  topTracksCount: number;
+  uniqueArtistsCount: number;
+  uniqueGenresCount: number;
+  avgPopularity: number;
+  topTracksTotalMs: number;
+  // Recent-based (last ~50 plays)
   totalListeningTimeMs: number;
   uniqueTracksCount: number;
-  uniqueArtistsCount: number;
+  recentPlaysCount: number;
   listeningByHour: Record<number, number>;
-  listeningByDay: Record<string, number>;
+  listeningByDay?: Record<string, number>;
   listeningByDayOfWeek: Record<string, number>;
   weekdayVsWeekend: { weekday: number; weekend: number };
 }
