@@ -155,36 +155,60 @@ export default function WrappedPage() {
     <div className="min-h-screen bg-[#0a0a0f]">
       <Navbar />
       <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
-        <div className="max-w-2xl mx-auto">
-        <div className="mt-8 mb-6">
+        <div className="mt-8 mb-7">
           <h1 className="text-2xl font-bold text-white mb-1">Wrapped</h1>
           <p className="text-sm text-white/35">Dönemsel müzik özetlerin</p>
         </div>
 
-        {/* Period selector */}
-        <div className="flex items-center bg-[#111118] border border-white/[0.06] rounded-xl p-1 gap-0.5 mb-4">
-          {periods.map((p) => (
+        <div className="grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-6 items-start">
+          {/* Left column — controls */}
+          <div className="space-y-4">
+            {/* Period selector */}
+            <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-4">
+              <p className="text-xs text-white/35 font-medium mb-2.5">Dönem seç</p>
+              <div className="grid grid-cols-2 gap-1.5">
+                {periods.map((p) => (
+                  <button
+                    key={p.value}
+                    onClick={() => setPeriod(p.value)}
+                    className={`px-3 py-2 rounded-lg text-xs font-semibold transition-all ${
+                      period === p.value ? "bg-[#1DB954] text-black" : "bg-white/[0.04] text-white/40 hover:text-white/70"
+                    }`}
+                  >
+                    {p.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <button
-              key={p.value}
-              onClick={() => setPeriod(p.value)}
-              className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                period === p.value ? "bg-[#1DB954] text-black" : "text-white/40 hover:text-white/70"
-              }`}
+              onClick={generateWrapped}
+              disabled={loading}
+              className="w-full py-3.5 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {p.label}
+              {loading ? <Spinner className="w-5 h-5" /> : <><Sparkles className="w-4 h-4" /> Wrapped Oluştur</>}
             </button>
-          ))}
-        </div>
 
-        <button
-          onClick={generateWrapped}
-          disabled={loading}
-          className="w-full py-3.5 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-xl transition-all mb-8 disabled:opacity-50 flex items-center justify-center gap-2"
-        >
-          {loading ? <Spinner className="w-5 h-5" /> : <><Sparkles className="w-4 h-4" /> Wrapped Oluştur</>}
-        </button>
+            {/* Share code */}
+            {data && data.shareCode && (
+              <div className="p-4 rounded-2xl bg-[#111118] border border-white/[0.06] flex items-center justify-between">
+                <div>
+                  <p className="text-white/30 text-xs mb-0.5">Paylaşım Kodu</p>
+                  <p className="text-white font-mono font-bold tracking-wider">{data.shareCode}</p>
+                </div>
+                <button
+                  onClick={copyCode}
+                  className="p-2.5 rounded-xl bg-[#1DB954]/10 text-[#1DB954] hover:bg-[#1DB954]/20 transition-all"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+                </button>
+              </div>
+            )}
+          </div>
 
-        {data && slides.length > 0 && (
+          {/* Right column — slide stage */}
+          <div>
+          {data && slides.length > 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {/* Slide card */}
             <div className="relative h-[440px] rounded-3xl border border-white/[0.08] flex items-center justify-center p-8 overflow-hidden bg-[#111118]">
@@ -233,30 +257,16 @@ export default function WrappedPage() {
                 <ChevronRight className="w-4 h-4 text-white" />
               </button>
             </div>
-
-            {/* Share code */}
-            {data.shareCode && (
-              <div className="mt-5 p-4 rounded-2xl bg-[#111118] border border-white/[0.06] flex items-center justify-between">
-                <div>
-                  <p className="text-white/30 text-xs mb-0.5">Paylaşım Kodu</p>
-                  <p className="text-white font-mono font-bold tracking-wider">{data.shareCode}</p>
-                </div>
-                <button
-                  onClick={copyCode}
-                  className="p-2.5 rounded-xl bg-[#1DB954]/10 text-[#1DB954] hover:bg-[#1DB954]/20 transition-all"
-                >
-                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-                </button>
-              </div>
-            )}
           </motion.div>
-        )}
-
-        {!data && !loading && (
-          <div className="text-center py-16 text-white/20 text-sm">
-            Dönem seç ve Wrapped'ini oluştur
+          ) : (
+            !loading && (
+              <div className="h-[440px] rounded-3xl border border-dashed border-white/[0.08] flex flex-col items-center justify-center text-white/20 text-sm bg-[#111118]/40">
+                <Sparkles className="w-8 h-8 mb-3 text-white/15" />
+                Dönem seç ve Wrapped&apos;ini oluştur
+              </div>
+            )
+          )}
           </div>
-        )}
         </div>
       </main>
     </div>
