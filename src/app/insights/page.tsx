@@ -75,7 +75,7 @@ export default function InsightsPage() {
     return (
       <div className="min-h-screen bg-[#0a0a0f]">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+        <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
           <div className="mt-8 text-center py-32 text-white/25 text-sm">İçgörüler yüklenemedi.</div>
         </main>
       </div>
@@ -89,7 +89,7 @@ export default function InsightsPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+      <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
         <div className="mt-8 mb-7">
           <h1 className="text-2xl font-bold text-white mb-1">İçgörüler</h1>
           <p className="text-sm text-white/35">Müzik zevkinin derinlemesine analizi</p>

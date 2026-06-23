@@ -68,7 +68,7 @@ export default function DiscoverPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+      <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
         <div className="mt-8 mb-7">
           <h1 className="text-2xl font-bold text-white mb-1">Müzik Keşfi</h1>
           <p className="text-sm text-white/35">Dinleme geçmişine göre kişiselleştirilmiş öneriler</p>

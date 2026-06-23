@@ -154,7 +154,8 @@ export default function WrappedPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <Navbar />
-      <main className="max-w-2xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+      <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
+        <div className="max-w-2xl mx-auto">
         <div className="mt-8 mb-6">
           <h1 className="text-2xl font-bold text-white mb-1">Wrapped</h1>
           <p className="text-sm text-white/35">Dönemsel müzik özetlerin</p>
@@ -256,6 +257,7 @@ export default function WrappedPage() {
             Dönem seç ve Wrapped'ini oluştur
           </div>
         )}
+        </div>
       </main>
     </div>
   );

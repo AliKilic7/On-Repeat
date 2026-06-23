@@ -54,7 +54,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-[#0a0a0f]">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+      <main className="px-4 sm:px-6 lg:px-10 pt-20 pb-16">
 
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 mb-5">
