@@ -1,2 +1,2 @@
 # SelfMeat
-Spotif Özet Uygulaması
+Spotify Özet Uygulaması
