@@ -2,9 +2,9 @@
 
 :root {
   --spotify-green: #1DB954;
-  --bg-primary: #0d0d1a;
-  --bg-secondary: #1a1a2e;
-  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-primary: #0a0a14;
+  --bg-secondary: #111827;
+  --bg-card: rgba(255, 255, 255, 0.04);
 }
 
 * {
@@ -21,29 +21,35 @@ html, body {
 body {
   background: var(--bg-primary);
   color: white;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #1a1a2e;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(29, 185, 84, 0.3);
-  border-radius: 3px;
+  background: rgba(29, 185, 84, 0.25);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(29, 185, 84, 0.6);
+  background: rgba(29, 185, 84, 0.5);
 }
 
 .glass {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 @keyframes gradient-shift {
@@ -53,7 +59,16 @@ body {
 }
 
 .animated-gradient {
-  background: linear-gradient(-45deg, #0d0d1a, #1a1a2e, #0d2a1a, #1a0d2e);
+  background: linear-gradient(-45deg, #0a0a14, #111827, #0d2010, #16082e);
   background-size: 400% 400%;
-  animation: gradient-shift 15s ease infinite;
+  animation: gradient-shift 18s ease infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(29, 185, 84, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(29, 185, 84, 0.4); }
+}
+
+.pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
 }
