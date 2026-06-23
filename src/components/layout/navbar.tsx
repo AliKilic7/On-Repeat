@@ -31,7 +31,7 @@ export function Navbar({ lang = "tr" }: NavbarProps) {
             <div className="w-8 h-8 rounded-full bg-[#1DB954] flex items-center justify-center">
               <Music className="w-4 h-4 text-black" />
             </div>
-            <span className="font-bold text-white text-lg tracking-tight">SelfMeat</span>
+            <span className="font-bold text-white text-lg tracking-tight">On Repeat</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">

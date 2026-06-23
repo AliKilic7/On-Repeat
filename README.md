@@ -1,4 +1,4 @@
-# SelfMeat — Spotify Analiz Platformu
+# On Repeat — Spotify Analiz Platformu
 
 Spotify Wrapped deneyimini yılda bir kez değil, her an yaşatan müzik analiz platformu.
 
@@ -33,7 +33,7 @@ npm run dev
 ## Ortam Değişkenleri
 
 \`\`\`env
-DATABASE_URL="postgresql://user:password@localhost:5432/selfmeat"
+DATABASE_URL="postgresql://user:password@localhost:5432/onrepeat"
 NEXTAUTH_URL="http://localhost:3000"
 NEXTAUTH_SECRET="your-secret"
 SPOTIFY_CLIENT_ID="your-spotify-client-id"

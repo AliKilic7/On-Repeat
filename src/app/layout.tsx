@@ -6,7 +6,7 @@ import { Providers } from "@/components/providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SelfMeat — Spotify Analiz",
+  title: "On Repeat — Spotify Analiz",
   description: "Müzik dinleme alışkanlıklarınızı keşfedin",
   icons: { icon: "/favicon.ico" },
 };
