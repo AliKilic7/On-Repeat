@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Users, UserPlus, Music, Star } from "lucide-react";
+import { Users, UserPlus, Music, ExternalLink } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
-import { Card } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 
 interface FriendUser {
@@ -22,7 +21,6 @@ export default function SocialPage() {
   const router = useRouter();
   const [friends, setFriends] = useState<FriendUser[]>([]);
   const [loading, setLoading] = useState(true);
-  const [lang] = useState<"tr" | "en">("tr");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/");
@@ -37,76 +35,67 @@ export default function SocialPage() {
   }, [session]);
 
   return (
-    <div className="min-h-screen bg-[#0d0d1a]">
-      <Navbar lang={lang} />
-      <main className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
-        <div className="mt-8 mb-8">
-          <h1 className="text-3xl font-black text-white mb-1">
-            {lang === "tr" ? "Sosyal" : "Social"}
-          </h1>
-          <p className="text-white/50">
-            {lang === "tr" ? "Arkadaşlarınla müzik deneyimini paylaş" : "Share your music experience with friends"}
-          </p>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <Navbar />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+        <div className="mt-8 mb-7">
+          <h1 className="text-2xl font-bold text-white mb-1">Sosyal</h1>
+          <p className="text-sm text-white/35">Arkadaşlarınla müzik deneyimini karşılaştır</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-8">
           {[
-            { icon: Users, value: friends.length.toString(), label: lang === "tr" ? "Arkadaş" : "Friends", color: "#1DB954" },
-            { icon: Music, value: "—", label: lang === "tr" ? "Ortak Şarkı" : "Common Tracks", color: "#A855F7" },
-            { icon: Star, value: "—", label: lang === "tr" ? "Uyumluluk" : "Compatibility", color: "#F59E0B" },
+            { icon: Users, value: friends.length, label: "Arkadaş",       color: "#1DB954" },
+            { icon: Music, value: "—",            label: "Ortak Parça",   color: "#A855F7" },
+            { icon: ExternalLink, value: "—",     label: "Uyumluluk",     color: "#F59E0B" },
           ].map((s, i) => (
             <motion.div
               key={i}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="glass rounded-2xl p-6 flex items-center gap-4"
+              transition={{ delay: i * 0.08 }}
+              className="bg-[#111118] border border-white/[0.06] rounded-2xl p-4"
             >
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: `${s.color}22` }}>
-                <s.icon className="w-6 h-6" style={{ color: s.color }} />
+              <div className="w-8 h-8 rounded-xl mb-3 flex items-center justify-center" style={{ background: `${s.color}15` }}>
+                <s.icon className="w-4 h-4" style={{ color: s.color }} />
               </div>
-              <div>
-                <p className="text-2xl font-bold text-white">{s.value}</p>
-                <p className="text-white/50 text-sm">{s.label}</p>
-              </div>
+              <p className="text-xl font-bold text-white">{s.value}</p>
+              <p className="text-xs text-white/30 mt-0.5">{s.label}</p>
             </motion.div>
           ))}
         </div>
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Spinner className="w-10 h-10" />
-          </div>
+          <div className="flex items-center justify-center py-32"><Spinner className="w-8 h-8" /></div>
         ) : friends.length === 0 ? (
-          <Card className="text-center py-16">
-            <UserPlus className="w-16 h-16 text-white/20 mx-auto mb-4" />
-            <p className="text-white/60 text-lg font-semibold mb-2">
-              {lang === "tr" ? "Henüz arkadaşın yok" : "No friends yet"}
-            </p>
-            <p className="text-white/30 text-sm">
-              {lang === "tr" ? "Arkadaşlarını davet et ve müzik uyumluluğunu keşfet!" : "Invite friends and discover your music compatibility!"}
-            </p>
-          </Card>
+          <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-12 text-center">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.04] flex items-center justify-center mx-auto mb-4">
+              <UserPlus className="w-8 h-8 text-white/15" />
+            </div>
+            <p className="text-white/50 font-semibold mb-1">Henüz arkadaşın yok</p>
+            <p className="text-white/25 text-sm">Arkadaşlarını davet et ve müzik uyumluluğunu keşfet</p>
+          </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {friends.map((friend, i) => (
               <motion.div
                 key={friend.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: i * 0.1 }}
-                className="glass rounded-2xl p-6 flex items-center gap-4"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.07 }}
+                className="bg-[#111118] border border-white/[0.06] rounded-2xl p-4 flex items-center gap-3 hover:border-white/[0.1] transition-colors"
               >
                 {friend.image ? (
-                  <Image src={friend.image} alt={friend.name ?? ""} width={56} height={56} className="rounded-full ring-2 ring-[#1DB954]/30" />
+                  <Image src={friend.image} alt={friend.name ?? ""} width={44} height={44} className="rounded-full ring-1 ring-white/10" />
                 ) : (
-                  <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white/30" />
+                  <div className="w-11 h-11 rounded-full bg-white/[0.05] flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-white/20" />
                   </div>
                 )}
-                <div>
-                  <p className="text-white font-semibold">{friend.name ?? lang === "tr" ? "Bilinmiyor" : "Unknown"}</p>
-                  <p className="text-white/40 text-sm">@{friend.spotifyId ?? "—"}</p>
+                <div className="min-w-0">
+                  <p className="text-white text-sm font-medium truncate">{friend.name ?? "Bilinmiyor"}</p>
+                  <p className="text-white/30 text-xs truncate">@{friend.spotifyId ?? "—"}</p>
                 </div>
               </motion.div>
             ))}

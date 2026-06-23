@@ -16,10 +16,10 @@ import { AnalyticsData } from "@/types";
 
 type TimeRange = "short_term" | "medium_term" | "long_term";
 
-const timeRanges: { value: TimeRange; labelTr: string; labelEn: string }[] = [
-  { value: "short_term", labelTr: "Son 4 Hafta", labelEn: "Last 4 Weeks" },
-  { value: "medium_term", labelTr: "Son 6 Ay", labelEn: "Last 6 Months" },
-  { value: "long_term", labelTr: "Tüm Zamanlar", labelEn: "All Time" },
+const timeRanges = [
+  { value: "short_term" as TimeRange,  label: "4 Hafta" },
+  { value: "medium_term" as TimeRange, label: "6 Ay"    },
+  { value: "long_term" as TimeRange,   label: "Tüm Zamanlar" },
 ];
 
 export default function DashboardPage() {
@@ -28,7 +28,6 @@ export default function DashboardPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("short_term");
-  const [lang] = useState<"tr" | "en">("tr");
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/");
@@ -45,78 +44,66 @@ export default function DashboardPage() {
 
   if (status === "loading" || !session) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Spinner className="w-10 h-10" />
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <Spinner className="w-8 h-8" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0d0d1a]">
-      <Navbar lang={lang} />
-      <main className="pt-20 pb-12 px-4 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mt-8 mb-8"
-        >
-          <h1 className="text-3xl font-black text-white mb-1">
-            {lang === "tr" ? "Müzik Analizin" : "Your Music Analytics"}
-          </h1>
-          <p className="text-white/50">
-            {lang === "tr"
-              ? `Merhaba, ${session.user.name?.split(" ")[0]}!`
-              : `Hello, ${session.user.name?.split(" ")[0]}!`}
-          </p>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <Navbar />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 mb-7 flex items-end justify-between flex-wrap gap-4">
+          <div>
+            <p className="text-white/35 text-sm font-medium mb-1">Hoş geldin, {session.user.name?.split(" ")[0]} 👋</p>
+            <h1 className="text-2xl font-bold text-white">Müzik Analizin</h1>
+          </div>
+
+          {/* Time range selector */}
+          <div className="flex items-center bg-[#111118] border border-white/[0.06] rounded-xl p-1 gap-0.5">
+            {timeRanges.map((tr) => (
+              <button
+                key={tr.value}
+                onClick={() => setTimeRange(tr.value)}
+                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  timeRange === tr.value
+                    ? "bg-[#1DB954] text-black"
+                    : "text-white/40 hover:text-white/70"
+                }`}
+              >
+                {tr.label}
+              </button>
+            ))}
+          </div>
         </motion.div>
 
-        <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
-          {timeRanges.map((tr) => (
-            <button
-              key={tr.value}
-              onClick={() => setTimeRange(tr.value)}
-              className={`px-5 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-                timeRange === tr.value
-                  ? "bg-[#1DB954] text-black"
-                  : "bg-white/10 text-white/70 hover:bg-white/20"
-              }`}
-            >
-              {lang === "tr" ? tr.labelTr : tr.labelEn}
-            </button>
-          ))}
-        </div>
-
         {loading ? (
-          <div className="flex items-center justify-center py-32">
-            <Spinner className="w-12 h-12" />
+          <div className="flex items-center justify-center py-40">
+            <Spinner className="w-10 h-10" />
           </div>
         ) : data ? (
-          <div className="space-y-6">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="space-y-5">
             <StatsGrid
               totalListeningTimeMs={data.totalListeningTimeMs}
               uniqueTracksCount={data.uniqueTracksCount}
               uniqueArtistsCount={data.uniqueArtistsCount}
               topGenresCount={data.topGenres.length}
-              lang={lang}
             />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <TopTracks tracks={data.topTracks} lang={lang} />
-              <TopArtists artists={data.topArtists} lang={lang} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <TopTracks tracks={data.topTracks} />
+              <TopArtists artists={data.topArtists} />
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <GenreChart genres={data.topGenres} lang={lang} />
-              <ListeningHeatmap listeningByHour={data.listeningByHour} lang={lang} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              <GenreChart genres={data.topGenres} />
+              <ListeningHeatmap listeningByHour={data.listeningByHour} />
             </div>
-            <WeekdayChart
-              listeningByDayOfWeek={data.listeningByDayOfWeek}
-              weekdayVsWeekend={data.weekdayVsWeekend}
-              lang={lang}
-            />
-          </div>
+            <WeekdayChart listeningByDayOfWeek={data.listeningByDayOfWeek} weekdayVsWeekend={data.weekdayVsWeekend} />
+          </motion.div>
         ) : (
-          <div className="text-center py-32 text-white/40">
-            {lang === "tr" ? "Veri yüklenemedi." : "Failed to load data."}
-          </div>
+          <div className="text-center py-40 text-white/25 text-sm">Veri yüklenemedi.</div>
         )}
       </main>
     </div>

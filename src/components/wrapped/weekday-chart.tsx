@@ -1,71 +1,58 @@
 "use client";
 
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { Card } from "@/components/ui/card";
-
 interface WeekdayChartProps {
   listeningByDayOfWeek: Record<string, number>;
   weekdayVsWeekend: { weekday: number; weekend: number };
-  lang?: "tr" | "en";
 }
 
-const dayNamesTr: Record<string, string> = {
-  Monday: "Pzt",
-  Tuesday: "Sal",
-  Wednesday: "Çar",
-  Thursday: "Per",
-  Friday: "Cum",
-  Saturday: "Cmt",
-  Sunday: "Paz",
-};
+const days = [
+  { key: "Monday",    short: "Pzt" },
+  { key: "Tuesday",   short: "Sal" },
+  { key: "Wednesday", short: "Çar" },
+  { key: "Thursday",  short: "Per" },
+  { key: "Friday",    short: "Cum" },
+  { key: "Saturday",  short: "Cmt", weekend: true },
+  { key: "Sunday",    short: "Paz", weekend: true },
+];
 
-export function WeekdayChart({ listeningByDayOfWeek, weekdayVsWeekend, lang = "tr" }: WeekdayChartProps) {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-  const data = days.map((d) => ({
-    name: lang === "tr" ? dayNamesTr[d] : d.slice(0, 3),
-    value: listeningByDayOfWeek[d] ?? 0,
-    isWeekend: d === "Saturday" || d === "Sunday",
-  }));
-
+export function WeekdayChart({ listeningByDayOfWeek, weekdayVsWeekend }: WeekdayChartProps) {
+  const values = days.map((d) => listeningByDayOfWeek[d.key] ?? 0);
+  const max = Math.max(...values, 1);
   const total = weekdayVsWeekend.weekday + weekdayVsWeekend.weekend;
-  const weekdayPct = total > 0 ? Math.round((weekdayVsWeekend.weekday / total) * 100) : 0;
-  const weekendPct = 100 - weekdayPct;
+  const wdPct = total > 0 ? Math.round((weekdayVsWeekend.weekday / total) * 100) : 50;
+  const wePct = 100 - wdPct;
 
   return (
-    <Card>
-      <h2 className="text-xl font-bold text-white mb-2">
-        {lang === "tr" ? "Günlük Dinleme" : "Daily Listening"}
-      </h2>
-      <div className="flex gap-4 mb-6 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-[#1DB954]" />
-          <span className="text-white/60">{lang === "tr" ? "Hafta içi" : "Weekday"} {weekdayPct}%</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-purple-500" />
-          <span className="text-white/60">{lang === "tr" ? "Hafta sonu" : "Weekend"} {weekendPct}%</span>
+    <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-sm font-semibold text-white">Günlük Dinleme</h2>
+        <div className="flex items-center gap-3 text-[11px] text-white/35">
+          <span><span className="text-[#1DB954]/70">●</span> Hafta içi {wdPct}%</span>
+          <span><span className="text-purple-400/70">●</span> Hafta sonu {wePct}%</span>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} barSize={28}>
-          <XAxis dataKey="name" tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 12 }} axisLine={false} tickLine={false} />
-          <YAxis hide />
-          <Tooltip
-            contentStyle={{
-              background: "#1a1a2e",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: "10px",
-              color: "white",
-              fontSize: "12px",
-            }}
-          />
-          <Bar dataKey="value" radius={[6, 6, 0, 0]}>
-            {data.map((entry, i) => (
-              <Cell key={i} fill={entry.isWeekend ? "#A855F7" : "#1DB954"} opacity={0.8} />
-            ))}
-          </Bar>
-        </BarChart>
-      </ResponsiveContainer>
-    </Card>
+
+      <div className="flex items-end gap-2 h-28">
+        {days.map((d, i) => {
+          const val = values[i];
+          const pct = (val / max) * 100;
+          return (
+            <div key={d.key} className="flex-1 flex flex-col items-center gap-1.5">
+              <div className="w-full flex flex-col justify-end" style={{ height: "80px" }}>
+                <div
+                  className="w-full rounded-lg transition-all"
+                  style={{
+                    height: `${Math.max(pct, val > 0 ? 8 : 4)}%`,
+                    backgroundColor: d.weekend ? "rgba(168,85,247,0.45)" : "rgba(29,185,84,0.45)",
+                  }}
+                  title={`${d.key}: ${val}`}
+                />
+              </div>
+              <span className="text-[10px] text-white/30">{d.short}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 }
