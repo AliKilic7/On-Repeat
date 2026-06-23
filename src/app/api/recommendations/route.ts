@@ -81,6 +81,34 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Fallback: related-artists endpoint is deprecated for new Spotify apps and
+    // may return nothing. Fill from new releases so the page isn't empty.
+    if (discovered.length < 5) {
+      try {
+        const newReleases = await spotifyFetch(
+          "/browse/new-releases?limit=20&country=TR",
+          token
+        );
+        for (const album of newReleases?.albums?.items ?? []) {
+          if (discovered.find((d) => d.trackId === album.id)) continue;
+          discovered.push({
+            trackId: album.id,
+            trackName: album.name,
+            artistName: album.artists?.[0]?.name ?? "",
+            albumName: album.name,
+            imageUrl: album.images?.[0]?.url ?? null,
+            previewUrl: null,
+            category: categories[discovered.length % categories.length],
+            reason: "Yeni çıkanlar",
+            score: 0.5,
+          });
+          if (discovered.length >= 25) break;
+        }
+      } catch (e) {
+        console.error("new-releases fallback failed:", e);
+      }
+    }
+
     return NextResponse.json({ recommendations: discovered });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

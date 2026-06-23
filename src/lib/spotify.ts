@@ -9,7 +9,59 @@ export async function getSpotifyToken(userId: string): Promise<string | null> {
     where: { userId, provider: "spotify" },
   });
   if (!account?.access_token) return null;
+
+  // Spotify access tokens expire after 1 hour. Refresh if expired (60s buffer).
+  const now = Math.floor(Date.now() / 1000);
+  const isExpired = !account.expires_at || account.expires_at <= now + 60;
+
+  if (isExpired && account.refresh_token) {
+    try {
+      const refreshed = await refreshSpotifyToken(account.refresh_token);
+      await prisma.account.update({
+        where: { id: account.id },
+        data: {
+          access_token: refreshed.access_token,
+          expires_at: now + (refreshed.expires_in ?? 3600),
+          // Spotify may or may not return a new refresh token
+          refresh_token: refreshed.refresh_token ?? account.refresh_token,
+        },
+      });
+      return refreshed.access_token;
+    } catch (err) {
+      console.error("Spotify token refresh failed:", err);
+      // Fall back to the existing token (may still work or fail downstream)
+      return account.access_token;
+    }
+  }
+
   return account.access_token;
+}
+
+async function refreshSpotifyToken(refreshToken: string): Promise<{
+  access_token: string;
+  expires_in?: number;
+  refresh_token?: string;
+}> {
+  const basic = Buffer.from(
+    `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`
+  ).toString("base64");
+
+  const res = await fetch("https://accounts.spotify.com/api/token", {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Token refresh error ${res.status}: ${await res.text()}`);
+  }
+  return res.json();
 }
 
 export async function spotifyFetch(
