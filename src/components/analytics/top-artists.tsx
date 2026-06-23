@@ -8,13 +8,13 @@ import { getColorForGenre } from "@/lib/utils";
 
 export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
   return (
-    <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
+    <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-white">En Çok Dinlenen Sanatçılar</h2>
-        <span className="text-xs text-white/25">{Math.min(artists.length, 8)} sanatçı</span>
+        <span className="text-xs text-white/25">{artists.length} sanatçı</span>
       </div>
-      <div className="space-y-0.5">
-        {artists.slice(0, 8).map((artist, i) => (
+      <div className="space-y-0.5 overflow-y-auto max-h-[520px] pr-1 scrollbar-thin">
+        {artists.map((artist, i) => (
           <motion.a
             key={artist.id}
             href={artist.external_urls.spotify}

@@ -91,6 +91,7 @@ export default function DashboardPage() {
               uniqueArtistsCount={data.uniqueArtistsCount}
               uniqueGenresCount={data.uniqueGenresCount}
               avgPopularity={data.avgPopularity}
+              totalListeningTimeMs={data.totalListeningTimeMs}
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
               <TopTracks tracks={data.topTracks} />

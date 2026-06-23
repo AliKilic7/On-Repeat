@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const [tracksData, artistsData, recentData] = await Promise.all([
-      getTopTracks(token, timeRange, 10),
-      getTopArtists(token, timeRange, 10),
+      getTopTracks(token, timeRange, 50),
+      getTopArtists(token, timeRange, 50),
       getRecentlyPlayed(token, 50),
     ]);
 
@@ -52,8 +52,8 @@ export async function GET(req: NextRequest) {
     );
 
     const data = {
-      topTracks: tracksData.items.slice(0, 5),
-      topArtists: artistsData.items.slice(0, 5),
+      topTracks: tracksData.items.slice(0, 10),
+      topArtists: artistsData.items.slice(0, 10),
       topGenres: genreList,
       totalListeningTimeMs: totalMs,
       tracksCount: recentData.items.length,

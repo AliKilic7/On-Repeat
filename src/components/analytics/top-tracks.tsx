@@ -7,13 +7,13 @@ import { SpotifyTrack } from "@/types";
 
 export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
   return (
-    <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
+    <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-sm font-semibold text-white">En Çok Dinlenenler</h2>
-        <span className="text-xs text-white/25">{Math.min(tracks.length, 10)} parça</span>
+        <span className="text-xs text-white/25">{tracks.length} parça</span>
       </div>
-      <div className="space-y-0.5">
-        {tracks.slice(0, 10).map((track, i) => (
+      <div className="space-y-0.5 overflow-y-auto max-h-[520px] pr-1 scrollbar-thin">
+        {tracks.map((track, i) => (
           <motion.a
             key={track.id}
             href={track.external_urls.spotify}
