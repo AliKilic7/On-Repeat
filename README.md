@@ -1,0 +1,2 @@
+# SelfMeat
+Spotif Özet Uygulaması
