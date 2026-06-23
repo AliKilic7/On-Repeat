@@ -5,11 +5,14 @@ import { motion } from "framer-motion";
 import { ExternalLink, Music } from "lucide-react";
 import { SpotifyTrack } from "@/types";
 
-export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
+export function TopTracks({ tracks, rangeLabel }: { tracks: SpotifyTrack[]; rangeLabel?: string }) {
   return (
     <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-white">En Çok Dinlenenler</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-white">En Çok Dinlenenler</h2>
+          {rangeLabel && <p className="text-[11px] text-white/30 mt-0.5">{rangeLabel}</p>}
+        </div>
         <span className="text-xs text-white/25">{tracks.length} parça</span>
       </div>
       <div className="space-y-0.5 overflow-y-auto max-h-[520px] pr-1 scrollbar-thin">

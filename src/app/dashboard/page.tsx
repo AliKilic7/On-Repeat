@@ -28,6 +28,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState<TimeRange>("short_term");
+  const activeLabel = timeRanges.find((tr) => tr.value === timeRange)?.label ?? "";
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/");
@@ -56,19 +57,20 @@ export default function DashboardPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-20 pb-16">
 
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 mb-7 flex items-end justify-between flex-wrap gap-4">
-          <div>
-            <p className="text-white/35 text-sm font-medium mb-1">Hoş geldin, {session.user.name?.split(" ")[0]} 👋</p>
-            <h1 className="text-2xl font-bold text-white">Müzik Analizin</h1>
-          </div>
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-8 mb-5">
+          <p className="text-white/35 text-sm font-medium mb-1">Hoş geldin, {session.user.name?.split(" ")[0]} 👋</p>
+          <h1 className="text-2xl font-bold text-white">Müzik Analizin</h1>
+        </motion.div>
 
-          {/* Time range selector */}
+        {/* Time range selector — full width segmented (like Wrapped) */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-2">
+          <p className="text-xs text-white/35 font-medium mb-2">Zaman aralığı seç</p>
           <div className="flex items-center bg-[#111118] border border-white/[0.06] rounded-xl p-1 gap-0.5">
             {timeRanges.map((tr) => (
               <button
                 key={tr.value}
                 onClick={() => setTimeRange(tr.value)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex-1 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
                   timeRange === tr.value
                     ? "bg-[#1DB954] text-black"
                     : "text-white/40 hover:text-white/70"
@@ -79,6 +81,9 @@ export default function DashboardPage() {
             ))}
           </div>
         </motion.div>
+        <p className="text-[11px] text-white/25 mb-6">
+          Aşağıdaki şarkı ve sanatçılar <span className="text-[#1DB954]/80 font-medium">{activeLabel}</span> dinleme verine göre listelenir.
+        </p>
 
         {loading ? (
           <div className="flex items-center justify-center py-40">
@@ -94,8 +99,8 @@ export default function DashboardPage() {
               totalListeningTimeMs={data.totalListeningTimeMs}
             />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              <TopTracks tracks={data.topTracks} />
-              <TopArtists artists={data.topArtists} />
+              <TopTracks tracks={data.topTracks} rangeLabel={activeLabel} />
+              <TopArtists artists={data.topArtists} rangeLabel={activeLabel} />
             </div>
             <GenreChart genres={data.topGenres} />
 

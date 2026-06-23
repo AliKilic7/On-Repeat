@@ -6,11 +6,14 @@ import { ExternalLink, Music } from "lucide-react";
 import { SpotifyArtist } from "@/types";
 import { getColorForGenre } from "@/lib/utils";
 
-export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
+export function TopArtists({ artists, rangeLabel }: { artists: SpotifyArtist[]; rangeLabel?: string }) {
   return (
     <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-white">En Çok Dinlenen Sanatçılar</h2>
+        <div>
+          <h2 className="text-sm font-semibold text-white">En Çok Dinlenen Sanatçılar</h2>
+          {rangeLabel && <p className="text-[11px] text-white/30 mt-0.5">{rangeLabel}</p>}
+        </div>
         <span className="text-xs text-white/25">{artists.length} sanatçı</span>
       </div>
       <div className="space-y-0.5 overflow-y-auto max-h-[520px] pr-1 scrollbar-thin">
