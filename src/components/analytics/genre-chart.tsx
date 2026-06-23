@@ -10,6 +10,9 @@ export function GenreChart({ genres }: { genres: GenreCount[] }) {
   return (
     <div className="bg-[#111118] border border-white/[0.06] rounded-2xl p-5">
       <h2 className="text-sm font-semibold text-white mb-5">Tür Dağılımı</h2>
+      {top.length === 0 && (
+        <p className="text-white/20 text-sm text-center py-6">Tür verisi bulunamadı.</p>
+      )}
       <div className="space-y-3">
         {top.map((g, i) => {
           const color = getColorForGenre(g.genre);
