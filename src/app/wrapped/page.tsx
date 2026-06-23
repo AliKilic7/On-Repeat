@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Share2, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Share2, Sparkles, Check } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 import { Spinner } from "@/components/ui/spinner";
 import { SpotifyTrack, SpotifyArtist } from "@/types";
+import toast from "react-hot-toast";
 
 type WrappedPeriod = "weekly" | "monthly" | "3monthly" | "6monthly";
 
@@ -22,11 +23,11 @@ interface WrappedData {
   period: string;
 }
 
-const periods: { value: WrappedPeriod; labelTr: string; labelEn: string }[] = [
-  { value: "weekly", labelTr: "Bu Hafta", labelEn: "This Week" },
-  { value: "monthly", labelTr: "Bu Ay", labelEn: "This Month" },
-  { value: "3monthly", labelTr: "3 Aylık", labelEn: "3 Months" },
-  { value: "6monthly", labelTr: "6 Aylık", labelEn: "6 Months" },
+const periods: { value: WrappedPeriod; label: string }[] = [
+  { value: "weekly",   label: "Bu Hafta" },
+  { value: "monthly",  label: "Bu Ay" },
+  { value: "3monthly", label: "3 Aylık" },
+  { value: "6monthly", label: "6 Aylık" },
 ];
 
 export default function WrappedPage() {
@@ -36,7 +37,7 @@ export default function WrappedPage() {
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState<WrappedPeriod>("weekly");
   const [slide, setSlide] = useState(0);
-  const [lang] = useState<"tr" | "en">("tr");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (status === "unauthenticated") router.push("/");
@@ -44,120 +45,131 @@ export default function WrappedPage() {
 
   const generateWrapped = async () => {
     setLoading(true);
-    const res = await fetch(`/api/wrapped?period=${period}`);
-    const d = await res.json();
-    setData(d);
+    try {
+      const res = await fetch(`/api/wrapped?period=${period}`);
+      const d = await res.json();
+      setData(d);
+      setSlide(0);
+    } catch {
+      toast.error("Wrapped oluşturulamadı");
+    }
     setLoading(false);
-    setSlide(0);
+  };
+
+  const copyCode = () => {
+    if (!data?.shareCode) return;
+    navigator.clipboard.writeText(data.shareCode);
+    setCopied(true);
+    toast.success("Kod kopyalandı");
+    setTimeout(() => setCopied(false), 2000);
   };
 
   const totalMinutes = data ? Math.round(data.totalListeningTimeMs / 60000) : 0;
 
-  const slides = data
-    ? [
-        {
-          bg: "from-[#1DB954]/20 to-[#0d0d1a]",
-          content: (
-            <div className="text-center">
-              <p className="text-[#1DB954] font-semibold mb-4 text-lg">{lang === "tr" ? "Senin" : "Your"}</p>
-              <h2 className="text-7xl font-black text-white mb-4">Wrapped</h2>
-              <p className="text-white/60 text-xl">{periods.find(p => p.value === period)?.[lang === "tr" ? "labelTr" : "labelEn"]}</p>
-            </div>
-          ),
-        },
-        {
-          bg: "from-purple-900/40 to-[#0d0d1a]",
-          content: (
-            <div className="text-center">
-              <p className="text-purple-400 font-semibold mb-6">{lang === "tr" ? "Toplam Dinleme" : "Total Listening"}</p>
-              <div className="text-8xl font-black text-white mb-2">{totalMinutes}</div>
-              <p className="text-white/60 text-2xl">{lang === "tr" ? "dakika" : "minutes"}</p>
-              <p className="text-white/40 mt-6">{lang === "tr" ? `${data.tracksCount} parça dinledin` : `You listened to ${data.tracksCount} tracks`}</p>
-            </div>
-          ),
-        },
-        {
-          bg: "from-blue-900/40 to-[#0d0d1a]",
-          content: (
-            <div className="text-center w-full">
-              <p className="text-blue-400 font-semibold mb-6">{lang === "tr" ? "En Sevdiğin Sanatçı" : "Top Artist"}</p>
-              {data.topArtists[0] && (
-                <>
-                  {data.topArtists[0].images[0] && (
-                    <div className="relative w-40 h-40 mx-auto rounded-full overflow-hidden ring-4 ring-blue-400/40 mb-6">
-                      <Image src={data.topArtists[0].images[0].url} alt={data.topArtists[0].name} fill className="object-cover" />
-                    </div>
-                  )}
-                  <h2 className="text-4xl font-black text-white">{data.topArtists[0].name}</h2>
-                </>
+  const slides = data ? [
+    {
+      accent: "#1DB954",
+      content: (
+        <div className="text-center">
+          <p className="text-[#1DB954] font-semibold mb-3 uppercase tracking-widest text-sm">Senin</p>
+          <h2 className="text-6xl sm:text-7xl font-black text-white mb-3">Wrapped</h2>
+          <p className="text-white/40 text-lg">{periods.find(p => p.value === period)?.label}</p>
+        </div>
+      ),
+    },
+    {
+      accent: "#A855F7",
+      content: (
+        <div className="text-center">
+          <p className="text-purple-400 font-semibold mb-5 uppercase tracking-widest text-sm">Toplam Dinleme</p>
+          <div className="text-7xl sm:text-8xl font-black text-white mb-1 tabular-nums">{totalMinutes.toLocaleString("tr")}</div>
+          <p className="text-white/50 text-xl">dakika</p>
+          <p className="text-white/30 text-sm mt-5">{data.tracksCount} parça dinledin</p>
+        </div>
+      ),
+    },
+    {
+      accent: "#3B82F6",
+      content: (
+        <div className="text-center w-full">
+          <p className="text-blue-400 font-semibold mb-6 uppercase tracking-widest text-sm">En Sevdiğin Sanatçı</p>
+          {data.topArtists[0] ? (
+            <>
+              {data.topArtists[0].images[0] && (
+                <div className="relative w-36 h-36 mx-auto rounded-full overflow-hidden ring-4 ring-blue-400/30 mb-5">
+                  <Image src={data.topArtists[0].images[0].url} alt={data.topArtists[0].name} fill sizes="144px" className="object-cover" />
+                </div>
               )}
-            </div>
-          ),
-        },
-        {
-          bg: "from-rose-900/40 to-[#0d0d1a]",
-          content: (
-            <div className="text-center w-full">
-              <p className="text-rose-400 font-semibold mb-6">{lang === "tr" ? "En Sevdiğin Şarkı" : "Top Track"}</p>
-              {data.topTracks[0] && (
-                <>
-                  {data.topTracks[0].album.images[0] && (
-                    <div className="relative w-40 h-40 mx-auto rounded-2xl overflow-hidden shadow-2xl mb-6">
-                      <Image src={data.topTracks[0].album.images[0].url} alt={data.topTracks[0].name} fill className="object-cover" />
-                    </div>
-                  )}
-                  <h2 className="text-3xl font-black text-white mb-2">{data.topTracks[0].name}</h2>
-                  <p className="text-white/60">{data.topTracks[0].artists[0]?.name}</p>
-                </>
+              <h2 className="text-3xl sm:text-4xl font-black text-white">{data.topArtists[0].name}</h2>
+            </>
+          ) : <p className="text-white/30">Veri yok</p>}
+        </div>
+      ),
+    },
+    {
+      accent: "#F43F5E",
+      content: (
+        <div className="text-center w-full">
+          <p className="text-rose-400 font-semibold mb-6 uppercase tracking-widest text-sm">En Sevdiğin Şarkı</p>
+          {data.topTracks[0] ? (
+            <>
+              {data.topTracks[0].album.images[0] && (
+                <div className="relative w-36 h-36 mx-auto rounded-2xl overflow-hidden shadow-2xl mb-5">
+                  <Image src={data.topTracks[0].album.images[0].url} alt={data.topTracks[0].name} fill sizes="144px" className="object-cover" />
+                </div>
               )}
-            </div>
-          ),
-        },
-        {
-          bg: "from-amber-900/40 to-[#0d0d1a]",
-          content: (
-            <div className="text-center">
-              <p className="text-amber-400 font-semibold mb-6">{lang === "tr" ? "En Sevdiğin Türler" : "Top Genres"}</p>
-              <div className="flex flex-wrap justify-center gap-3">
-                {data.topGenres.map((g, i) => (
-                  <span
-                    key={g}
-                    className="px-6 py-3 rounded-full font-bold text-white"
-                    style={{
-                      fontSize: `${1.4 - i * 0.15}rem`,
-                      background: `rgba(245, 158, 11, ${0.3 - i * 0.04})`,
-                      border: "1px solid rgba(245,158,11,0.3)",
-                    }}
-                  >
-                    {g}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ),
-        },
-      ]
-    : [];
+              <h2 className="text-2xl sm:text-3xl font-black text-white mb-1.5">{data.topTracks[0].name}</h2>
+              <p className="text-white/50">{data.topTracks[0].artists[0]?.name}</p>
+            </>
+          ) : <p className="text-white/30">Veri yok</p>}
+        </div>
+      ),
+    },
+    {
+      accent: "#F59E0B",
+      content: (
+        <div className="text-center">
+          <p className="text-amber-400 font-semibold mb-6 uppercase tracking-widest text-sm">En Sevdiğin Türler</p>
+          <div className="flex flex-wrap justify-center gap-2.5 px-4">
+            {data.topGenres.length > 0 ? data.topGenres.slice(0, 6).map((g, i) => (
+              <span
+                key={g}
+                className="px-4 py-2 rounded-full font-bold text-white capitalize"
+                style={{
+                  fontSize: `${1.2 - i * 0.1}rem`,
+                  background: `rgba(245,158,11,${0.22 - i * 0.025})`,
+                  border: "1px solid rgba(245,158,11,0.25)",
+                }}
+              >
+                {g}
+              </span>
+            )) : <p className="text-white/30">Tür verisi yok</p>}
+          </div>
+        </div>
+      ),
+    },
+  ] : [];
 
   return (
-    <div className="min-h-screen bg-[#0d0d1a]">
-      <Navbar lang={lang} />
-      <main className="pt-20 pb-12 px-4 max-w-2xl mx-auto">
-        <div className="mt-8 mb-8">
-          <h1 className="text-3xl font-black text-white mb-1">Wrapped</h1>
-          <p className="text-white/50">{lang === "tr" ? "Dönemsel müzik özetlerin" : "Your periodic music summary"}</p>
+    <div className="min-h-screen bg-[#0a0a0f]">
+      <Navbar />
+      <main className="max-w-xl mx-auto px-4 sm:px-6 pt-20 pb-16">
+        <div className="mt-8 mb-6">
+          <h1 className="text-2xl font-bold text-white mb-1">Wrapped</h1>
+          <p className="text-sm text-white/35">Dönemsel müzik özetlerin</p>
         </div>
 
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {/* Period selector */}
+        <div className="flex items-center bg-[#111118] border border-white/[0.06] rounded-xl p-1 gap-0.5 mb-4">
           {periods.map((p) => (
             <button
               key={p.value}
               onClick={() => setPeriod(p.value)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-all ${
-                period === p.value ? "bg-[#1DB954] text-black" : "bg-white/10 text-white/70 hover:bg-white/20"
+              className={`flex-1 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                period === p.value ? "bg-[#1DB954] text-black" : "text-white/40 hover:text-white/70"
               }`}
             >
-              {lang === "tr" ? p.labelTr : p.labelEn}
+              {p.label}
             </button>
           ))}
         </div>
@@ -165,71 +177,82 @@ export default function WrappedPage() {
         <button
           onClick={generateWrapped}
           disabled={loading}
-          className="w-full py-4 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-2xl transition-all mb-8 disabled:opacity-50"
+          className="w-full py-3.5 bg-[#1DB954] hover:bg-[#1ed760] text-black font-bold rounded-xl transition-all mb-8 disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {loading ? <Spinner className="w-5 h-5 mx-auto" /> : (lang === "tr" ? "Wrapped Oluştur" : "Generate Wrapped")}
+          {loading ? <Spinner className="w-5 h-5" /> : <><Sparkles className="w-4 h-4" /> Wrapped Oluştur</>}
         </button>
 
         {data && slides.length > 0 && (
-          <div>
-            <div className={`relative h-[500px] rounded-3xl bg-gradient-to-b ${slides[slide].bg} border border-white/10 flex items-center justify-center p-8 overflow-hidden`}>
-              <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute -top-20 -right-20 w-60 h-60 rounded-full bg-white/5 blur-3xl" />
-                <div className="absolute -bottom-20 -left-20 w-60 h-60 rounded-full bg-white/5 blur-3xl" />
-              </div>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            {/* Slide card */}
+            <div className="relative h-[440px] rounded-3xl border border-white/[0.08] flex items-center justify-center p-8 overflow-hidden bg-[#111118]">
+              <div
+                className="absolute inset-0 opacity-40 transition-colors duration-500"
+                style={{ background: `radial-gradient(circle at 50% 30%, ${slides[slide].accent}25, transparent 70%)` }}
+              />
               <AnimatePresence mode="wait">
                 <motion.div
                   key={slide}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.05 }}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
                   transition={{ duration: 0.3 }}
                   className="relative z-10 w-full"
                 >
                   {slides[slide].content}
                 </motion.div>
               </AnimatePresence>
+
+              {/* Progress dots top */}
+              <div className="absolute top-4 left-0 right-0 flex gap-1.5 px-6">
+                {slides.map((_, i) => (
+                  <div key={i} className="flex-1 h-1 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full transition-all duration-300" style={{ width: i <= slide ? "100%" : "0%", backgroundColor: slides[slide].accent }} />
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="flex items-center justify-between mt-6">
+            {/* Controls */}
+            <div className="flex items-center justify-between mt-5">
               <button
                 onClick={() => setSlide(Math.max(0, slide - 1))}
                 disabled={slide === 0}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all"
+                className="p-2.5 rounded-xl bg-[#111118] border border-white/[0.06] hover:bg-white/[0.06] disabled:opacity-25 transition-all"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-4 h-4 text-white" />
               </button>
-              <div className="flex gap-2">
-                {slides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setSlide(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      i === slide ? "bg-[#1DB954] w-6" : "bg-white/30"
-                    }`}
-                  />
-                ))}
-              </div>
+              <span className="text-xs text-white/30 font-medium">{slide + 1} / {slides.length}</span>
               <button
                 onClick={() => setSlide(Math.min(slides.length - 1, slide + 1))}
                 disabled={slide === slides.length - 1}
-                className="p-3 rounded-full bg-white/10 hover:bg-white/20 disabled:opacity-30 transition-all"
+                className="p-2.5 rounded-xl bg-[#111118] border border-white/[0.06] hover:bg-white/[0.06] disabled:opacity-25 transition-all"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-4 h-4 text-white" />
               </button>
             </div>
 
+            {/* Share code */}
             {data.shareCode && (
-              <div className="mt-6 p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between">
+              <div className="mt-5 p-4 rounded-2xl bg-[#111118] border border-white/[0.06] flex items-center justify-between">
                 <div>
-                  <p className="text-white/50 text-sm">{lang === "tr" ? "Paylaşım Kodu" : "Share Code"}</p>
-                  <p className="text-white font-mono font-bold text-lg">{data.shareCode}</p>
+                  <p className="text-white/30 text-xs mb-0.5">Paylaşım Kodu</p>
+                  <p className="text-white font-mono font-bold tracking-wider">{data.shareCode}</p>
                 </div>
-                <button className="p-3 rounded-xl bg-[#1DB954]/20 text-[#1DB954] hover:bg-[#1DB954]/30 transition-all">
-                  <Share2 className="w-5 h-5" />
+                <button
+                  onClick={copyCode}
+                  className="p-2.5 rounded-xl bg-[#1DB954]/10 text-[#1DB954] hover:bg-[#1DB954]/20 transition-all"
+                >
+                  {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
                 </button>
               </div>
             )}
+          </motion.div>
+        )}
+
+        {!data && !loading && (
+          <div className="text-center py-16 text-white/20 text-sm">
+            Dönem seç ve Wrapped'ini oluştur
           </div>
         )}
       </main>

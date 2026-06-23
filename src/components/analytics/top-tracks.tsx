@@ -27,7 +27,7 @@ export function TopTracks({ tracks }: { tracks: SpotifyTrack[] }) {
             <span className="text-white/20 text-[11px] font-mono w-4 text-right flex-shrink-0 tabular-nums">{i + 1}</span>
             <div className="relative w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-white/[0.04]">
               {track.album.images[0] ? (
-                <Image src={track.album.images[0].url} alt={track.album.name} fill className="object-cover" />
+                <Image src={track.album.images[0].url} alt={track.album.name} fill sizes="36px" className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <Music className="w-3.5 h-3.5 text-white/15" />

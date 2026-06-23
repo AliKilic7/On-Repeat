@@ -102,7 +102,7 @@ export default function DiscoverPage() {
                       >
                         <div className="relative aspect-square bg-white/[0.03]">
                           {rec.imageUrl ? (
-                            <Image src={rec.imageUrl} alt={rec.trackName} fill className="object-cover" />
+                            <Image src={rec.imageUrl} alt={rec.trackName} fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw" className="object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <Music className="w-8 h-8 text-white/10" />

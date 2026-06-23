@@ -28,7 +28,7 @@ export function TopArtists({ artists }: { artists: SpotifyArtist[] }) {
             <span className="text-white/20 text-[11px] font-mono w-4 text-right flex-shrink-0 tabular-nums">{i + 1}</span>
             <div className="relative w-9 h-9 rounded-full overflow-hidden flex-shrink-0 bg-white/[0.04] ring-1 ring-white/[0.06]">
               {artist.images[0] ? (
-                <Image src={artist.images[0].url} alt={artist.name} fill className="object-cover" />
+                <Image src={artist.images[0].url} alt={artist.name} fill sizes="36px" className="object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   <Music className="w-3.5 h-3.5 text-white/15" />
